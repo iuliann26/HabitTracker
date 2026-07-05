@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ro" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PersonalOS - Analiză Lunară</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-body-tertiary">
+<div class="container py-5">
+    <header class="pb-3 mb-5 border-bottom d-flex justify-content-between align-items-center">
+        <h1 class="fs-3">📊 Analiză de Performanță și Buget</h1>
+        <a href="/dashboard" class="btn btn-outline-secondary btn-sm">Inapoi la Dashboard</a>
+    </header>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="p-4 bg-dark rounded-3 border border-secondary shadow-sm text-center">
+                <h5 class="text-muted">Consistență Core Habits</h5>
+                <h1 class="display-4 fw-bold text-success">{{ discipline_score }}%</h1>
+                <p class="small text-muted mb-0">Procentul de sarcini îndeplinite din totalul zilelor monitorizate ({{ total_days }} zile).</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="p-4 bg-dark rounded-3 border border-secondary shadow-sm text-center">
+                <h5 class="text-muted">Total Cheltuieli Periodice</h5>
+                <h1 class="display-4 fw-bold text-warning">{{ "%.2f"|format(total_spent) }} RON</h1>
+                <p class="small text-muted mb-0">Raportat la targetul tău setat de {{ profile.monthly_budget }} RON/lună.</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="p-4 bg-dark rounded-3 border border-secondary shadow-sm text-center">
+                <h5 class="text-muted">Medie Țigări / Zi</h5>
+                <h1 class="display-4 fw-bold text-danger">{{ avg_cigarettes }}</h1>
+                <p class="small text-muted mb-0">Scopul este ca această medie să scadă în fiecare lună conform planului treptat.</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

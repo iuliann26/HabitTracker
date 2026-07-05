@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="ro" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#090d14">
+    <title>PersonalOS - Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            color-scheme: dark;
+
+            --bg-main: #090d14;
+            --bg-main-soft: #0d121b;
+            --bg-card: rgba(21, 26, 35, 0.92);
+            --bg-card-strong: #151a23;
+            --bg-elevated: #1a202b;
+            --bg-input: rgba(5, 8, 13, 0.52);
+
+            --border-soft: rgba(255, 255, 255, 0.055);
+            --border-medium: rgba(255, 255, 255, 0.09);
+            --border-strong: rgba(255, 255, 255, 0.14);
+
+            --text-primary: #f7f9fc;
+            --text-secondary: #b7c0ce;
+            --text-muted: #758094;
+
+            --clr-core: #22c993;
+            --clr-core-soft: rgba(34, 201, 147, 0.12);
+            --clr-gamify: #8b5cf6;
+            --clr-gamify-blue: #5b7cfa;
+            --clr-warning: #ffad42;
+            --clr-danger: #ff5d73;
+            --clr-info: #55c7f3;
+
+            --radius-xl: 24px;
+            --radius-lg: 20px;
+            --radius-md: 16px;
+            --radius-sm: 13px;
+
+            --shadow-card: 0 18px 45px rgba(0, 0, 0, 0.28), 0 2px 10px rgba(0, 0, 0, 0.16);
+            --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.18);
+            --tap-size: 48px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            background: var(--bg-main);
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text-primary);
+            background:
+                radial-gradient(circle at 12% -8%, rgba(91, 124, 250, 0.16), transparent 31rem),
+                radial-gradient(circle at 88% 8%, rgba(139, 92, 246, 0.13), transparent 27rem),
+                linear-gradient(180deg, #090d14 0%, #0b1018 55%, #090d14 100%);
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            overscroll-behavior-y: contain;
+        }
+
+        body::before {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            content: "";
+            opacity: 0.22;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            background-size: 32px 32px;
+            mask-image: linear-gradient(to bottom, black, transparent 75%);
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button,
+        .btn {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        button:focus-visible,
+        input:focus-visible {
+            outline: 3px solid rgba(91, 124, 250, 0.28);
+            outline-offset: 2px;
+        }
+
+        .min-w-0 {
+            min-width: 0;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 940px;
+            margin: 0 auto;
+            padding:
+                max(12px, env(safe-area-inset-top))
+                14px
+                max(34px, calc(env(safe-area-inset-bottom) + 22px));
+        }
+
+        .app-topbar {
+            position: sticky;
+            top: 10px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            min-height: 76px;
+            margin-bottom: 18px;
+            padding: 12px 13px 12px 16px;
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            background: rgba(13, 18, 27, 0.72);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.22);
+            backdrop-filter: blur(22px) saturate(145%);
+            -webkit-backdrop-filter: blur(22px) saturate(145%);
+        }
+
+        .eyebrow {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.115em;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .welcome-title {
+            max-width: 52vw;
+            margin: 0;
+            overflow: hidden;
+            color: var(--text-primary);
+            font-size: clamp(1.08rem, 4.7vw, 1.4rem);
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            line-height: 1.22;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .level-panel {
+            flex: 0 0 auto;
+            width: 108px;
+            padding: 9px 10px 8px;
+            border: 1px solid rgba(169, 139, 255, 0.2);
+            border-radius: 15px;
+            background:
+                linear-gradient(145deg, rgba(139, 92, 246, 0.19), rgba(91, 124, 250, 0.08)),
+                rgba(255, 255, 255, 0.018);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .level-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 7px;
+            margin-bottom: 8px;
+            color: #efeaff;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+
+        .level-badge__icon {
+            display: grid;
+            width: 24px;
+            height: 24px;
+            flex: 0 0 24px;
+            place-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.11);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .xp-track {
+            height: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.28);
+        }
+
+        .xp-fill {
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #7c5cff 0%, #6e8cff 62%, #62c8ff 100%);
+            box-shadow: 0 0 13px rgba(124, 92, 255, 0.48);
+            transition: width 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+            animation: xpReveal 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .xp-label {
+            display: block;
+            margin-top: 6px;
+            color: #918ba4;
+            font-size: 0.61rem;
+            font-weight: 600;
+            line-height: 1;
+            text-align: right;
+        }
+
+        .premium-card {
+            position: relative;
+            overflow: hidden;
+            padding: 18px;
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            background: var(--bg-card);
+            box-shadow: var(--shadow-card);
+            isolation: isolate;
+        }
+
+        .premium-card::after {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            content: "";
+            border-radius: inherit;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+        }
+
+        .hero-card {
+            min-height: 188px;
+            margin-bottom: 24px;
+            padding: 22px 18px;
+            border-color: rgba(139, 92, 246, 0.18);
+            background:
+                radial-gradient(circle at 17% 25%, rgba(34, 201, 147, 0.15), transparent 36%),
+                radial-gradient(circle at 88% 12%, rgba(139, 92, 246, 0.24), transparent 38%),
+                linear-gradient(135deg, #161c2a 0%, #161727 47%, #121722 100%);
+        }
+
+        .hero-card::before {
+            position: absolute;
+            top: -58px;
+            right: -48px;
+            width: 176px;
+            height: 176px;
+            pointer-events: none;
+            content: "";
+            border: 1px solid rgba(255, 255, 255, 0.055);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.015);
+            box-shadow:
+                0 0 0 24px rgba(255, 255, 255, 0.009),
+                0 0 0 52px rgba(255, 255, 255, 0.006);
+        }
+
+        .score-ring-wrap {
+            position: relative;
+            display: grid;
+            width: 132px;
+            height: 132px;
+            margin: 0 auto;
+            place-items: center;
+        }
+
+        .score-ring-wrap svg {
+            width: 132px;
+            height: 132px;
+            overflow: visible;
+        }
+
+        .score-ring-track {
+            stroke: rgba(255, 255, 255, 0.075);
+        }
+
+        .progress-ring-circle {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            stroke: url(#scoreGradient);
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 7px rgba(34, 201, 147, 0.52));
+            transition: stroke-dashoffset 1.25s cubic-bezier(0.22, 1, 0.36, 1);
+            animation: ringReveal 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .score-value {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .score-value strong {
+            font-size: 1.55rem;
+            font-weight: 800;
+            letter-spacing: -0.06em;
+        }
+
+        .score-value span {
+            margin-top: 5px;
+            color: #8d98ab;
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .hero-copy {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 8px;
+            padding: 6px 9px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 999px;
+            color: #aeb8c8;
+            background: rgba(0, 0, 0, 0.17);
+            font-size: 0.64rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .hero-kicker::before {
+            width: 7px;
+            height: 7px;
+            content: "";
+            border-radius: 50%;
+            background: var(--clr-core);
+            box-shadow: 0 0 12px rgba(34, 201, 147, 0.8);
+        }
+
+        .hero-title {
+            margin: 0 0 7px;
+            color: #ffffff;
+            font-size: clamp(1.32rem, 5.5vw, 1.75rem);
+            font-weight: 800;
+            letter-spacing: -0.045em;
+        }
+
+        .hero-description {
+            max-width: 33rem;
+            margin: 0;
+            color: #98a3b5;
+            font-size: 0.82rem;
+            line-height: 1.55;
+        }
+
+        .section-block {
+            margin-bottom: 24px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 0 2px 12px;
+        }
+
+        .section-heading__main {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 0;
+            color: #dfe5ee;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.085em;
+            text-transform: uppercase;
+        }
+
+        .section-heading__dot {
+            width: 8px;
+            height: 8px;
+            flex: 0 0 8px;
+            border-radius: 50%;
+            background: var(--clr-danger);
+            box-shadow: 0 0 12px rgba(255, 93, 115, 0.48);
+        }
+
+        .section-heading__caption {
+            color: #606b7e;
+            font-size: 0.66rem;
+            font-weight: 600;
+        }
+
+        .habit-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .habit-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            min-height: 76px;
+            padding: 12px 12px 12px 15px;
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.018), transparent),
+                rgba(18, 23, 32, 0.88);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.13);
+            transition:
+                transform 180ms ease,
+                border-color 180ms ease,
+                background-color 180ms ease,
+                box-shadow 180ms ease;
+        }
+
+        .habit-row.completed {
+            border-color: rgba(34, 201, 147, 0.2);
+            background:
+                linear-gradient(135deg, rgba(34, 201, 147, 0.10), rgba(34, 201, 147, 0.025)),
+                rgba(18, 28, 30, 0.88);
+            box-shadow: 0 10px 27px rgba(0, 0, 0, 0.14), inset 3px 0 0 rgba(34, 201, 147, 0.62);
+        }
+
+        .habit-copy {
+            min-width: 0;
+        }
+
+        .habit-title {
+            display: block;
+            overflow: hidden;
+            color: #edf1f7;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: -0.018em;
+            line-height: 1.32;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: color 180ms ease, opacity 180ms ease;
+        }
+
+        .habit-row.completed .habit-title {
+            color: #8da39c;
+            opacity: 0.78;
+            text-decoration: line-through;
+            text-decoration-color: rgba(141, 163, 156, 0.58);
+            text-decoration-thickness: 1.5px;
+        }
+
+        .habit-note {
+            display: block;
+            margin-top: 4px;
+            overflow: hidden;
+            color: #707b8e;
+            font-size: 0.69rem;
+            font-weight: 500;
+            line-height: 1.35;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .habit-form {
+            flex: 0 0 auto;
+            margin: 0;
+        }
+
+        .habit-toggle {
+            display: grid;
+            width: var(--tap-size);
+            min-width: var(--tap-size);
+            height: var(--tap-size);
+            min-height: var(--tap-size);
+            padding: 0;
+            place-items: center;
+            border: 1px solid var(--border-medium);
+            border-radius: 15px;
+            color: #7e899c;
+            background: rgba(255, 255, 255, 0.025);
+            font-size: 1rem;
+            font-weight: 800;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+            transition:
+                transform 120ms ease,
+                background-color 180ms ease,
+                border-color 180ms ease,
+                color 180ms ease,
+                box-shadow 180ms ease;
+        }
+
+        .habit-toggle.is-complete {
+            border-color: rgba(34, 201, 147, 0.3);
+            color: #061b14;
+            background: linear-gradient(145deg, #30d9a2, #20bc89);
+            box-shadow: 0 8px 21px rgba(34, 201, 147, 0.19), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .module-card {
+            height: 100%;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .module-title-wrap {
+            min-width: 0;
+        }
+
+        .module-kicker {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--text-muted);
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.095em;
+            text-transform: uppercase;
+        }
+
+        .module-title {
+            margin: 0;
+            color: #eef2f8;
+            font-size: 0.96rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            line-height: 1.25;
+        }
+
+        .module-title--warning {
+            color: #ffd59c;
+        }
+
+        .module-title--danger {
+            color: #ffb1bd;
+        }
+
+        .module-title--info {
+            color: #bdefff;
+        }
+
+        .module-title--success {
+            color: #b9f4df;
+        }
+
+        .status-chip {
+            display: inline-flex;
+            min-height: 28px;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 9px;
+            border: 1px solid var(--border-soft);
+            border-radius: 999px;
+            color: #8e99aa;
+            background: rgba(255, 255, 255, 0.025);
+            font-size: 0.62rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .status-chip--success {
+            border-color: rgba(34, 201, 147, 0.18);
+            color: #7ce4bd;
+            background: rgba(34, 201, 147, 0.08);
+        }
+
+        .status-chip--danger {
+            border-color: rgba(255, 93, 115, 0.18);
+            color: #ff9aaa;
+            background: rgba(255, 93, 115, 0.08);
+        }
+
+        .nutrition-progress {
+            position: relative;
+            height: 12px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.035);
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.25);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.22);
+        }
+
+        .nutrition-progress__bar {
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #f59e0b 0%, #ffb949 62%, #ffd18a 100%);
+            box-shadow: 0 0 17px rgba(245, 158, 11, 0.28);
+            transition: width 900ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .nutrition-progress__bar::after {
+            position: absolute;
+            inset: 0;
+            content: "";
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.24), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 2.8s ease-in-out infinite;
+        }
+
+        .progress-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 16px;
+            color: #778397;
+            font-size: 0.72rem;
+            font-weight: 500;
+        }
+
+        .progress-meta strong {
+            color: #f6f8fb;
+            font-weight: 800;
+        }
+
+        .compact-form {
+            margin-bottom: 15px;
+        }
+
+        .form-control-premium {
+            min-height: var(--tap-size);
+            border: 1px solid var(--border-soft);
+            border-radius: 14px;
+            color: var(--text-primary);
+            background: var(--bg-input);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+            font-size: 0.82rem;
+            transition:
+                border-color 180ms ease,
+                background-color 180ms ease,
+                box-shadow 180ms ease;
+        }
+
+        .form-control-premium::placeholder {
+            color: #596477;
+            opacity: 1;
+        }
+
+        .form-control-premium:focus {
+            border-color: rgba(91, 124, 250, 0.48);
+            color: #ffffff;
+            background: rgba(5, 8, 13, 0.74);
+            box-shadow: 0 0 0 4px rgba(91, 124, 250, 0.10);
+        }
+
+        .tap-button {
+            min-height: var(--tap-size);
+            border-radius: 14px;
+            font-size: 0.84rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            transition:
+                transform 120ms ease,
+                filter 180ms ease,
+                box-shadow 180ms ease;
+        }
+
+        .tap-button:active,
+        .habit-toggle:active,
+        .routine-button:active {
+            transform: scale(0.97);
+        }
+
+        .button-warning {
+            border: 0;
+            color: #211200;
+            background: linear-gradient(145deg, #ffc15b, #f59e0b);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+
+        .button-danger {
+            border: 0;
+            color: #ffffff;
+            background: linear-gradient(145deg, #ff6b80, #e83f59);
+            box-shadow: 0 8px 20px rgba(232, 63, 89, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        }
+
+        .button-success {
+            border: 0;
+            color: #061b14;
+            background: linear-gradient(145deg, #43dcaa, #22ba88);
+            box-shadow: 0 8px 20px rgba(34, 186, 136, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        }
+
+        .meal-badge-scroll {
+            display: flex;
+            gap: 9px;
+            overflow-x: auto;
+            margin-inline: -18px;
+            padding: 1px 18px 4px;
+            scroll-padding-inline: 18px;
+            scroll-snap-type: x proximity;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .meal-badge-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .meal-chip {
+            display: inline-flex;
+            min-height: 42px;
+            flex: 0 0 auto;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 12px;
+            scroll-snap-align: start;
+            border: 1px solid var(--border-soft);
+            border-radius: 14px;
+            color: #dce2ea;
+            background:
+                linear-gradient(135deg, rgba(255, 173, 66, 0.075), transparent),
+                rgba(255, 255, 255, 0.025);
+            font-size: 0.7rem;
+            font-weight: 600;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+        }
+
+        .meal-chip__time {
+            color: #8490a3;
+            font-size: 0.64rem;
+            font-weight: 700;
+        }
+
+        .empty-state {
+            width: 100%;
+            padding: 14px;
+            border: 1px dashed rgba(255, 255, 255, 0.075);
+            border-radius: 14px;
+            color: #657186;
+            background: rgba(255, 255, 255, 0.014);
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .smoke-alert {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 14px;
+            padding: 11px 12px;
+            border: 1px solid rgba(255, 93, 115, 0.32);
+            border-radius: 14px;
+            color: #ffacb8;
+            background:
+                linear-gradient(135deg, rgba(255, 93, 115, 0.14), rgba(255, 93, 115, 0.045)),
+                rgba(35, 12, 18, 0.42);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 0 0 0 rgba(255, 93, 115, 0.2);
+            font-size: 0.72rem;
+            font-weight: 800;
+            line-height: 1.35;
+            text-align: center;
+            animation: alertPulse 2.4s ease-in-out infinite;
+        }
+
+        .smoke-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            min-height: 94px;
+            padding: 14px;
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            background:
+                radial-gradient(circle at 0% 100%, rgba(255, 93, 115, 0.08), transparent 43%),
+                rgba(5, 8, 13, 0.34);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+        }
+
+        .metric-label {
+            display: block;
+            margin-bottom: 4px;
+            color: #738095;
+            font-size: 0.66rem;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            margin: 0;
+            color: #ffffff;
+            font-size: clamp(1.42rem, 7vw, 1.9rem);
+            font-weight: 800;
+            letter-spacing: -0.055em;
+            line-height: 1.05;
+        }
+
+        .metric-value__unit {
+            color: #8f99aa;
+            font-size: 0.78rem;
+            font-weight: 650;
+            letter-spacing: -0.01em;
+        }
+
+        .routine-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .routine-grid form {
+            margin: 0;
+        }
+
+        .routine-button {
+            display: flex;
+            min-height: 62px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid rgba(85, 199, 243, 0.22);
+            border-radius: 15px;
+            color: #9bddf8;
+            background: rgba(85, 199, 243, 0.035);
+            font-size: 0.76rem;
+            font-weight: 800;
+            line-height: 1.2;
+            transition:
+                transform 120ms ease,
+                border-color 180ms ease,
+                color 180ms ease,
+                background-color 180ms ease,
+                box-shadow 180ms ease;
+        }
+
+        .routine-button.is-complete {
+            border-color: rgba(85, 199, 243, 0.42);
+            color: #04151c;
+            background: linear-gradient(145deg, #7bdbff, #49bce9);
+            box-shadow: 0 9px 22px rgba(73, 188, 233, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        }
+
+        .finance-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .finance-stat {
+            min-width: 0;
+            padding: 13px;
+            border: 1px solid var(--border-soft);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.018);
+        }
+
+        .finance-stat:last-child {
+            text-align: right;
+        }
+
+        .finance-stat__label {
+            display: block;
+            margin-bottom: 5px;
+            color: #737e91;
+            font-size: 0.64rem;
+            font-weight: 650;
+        }
+
+        .finance-stat__value {
+            display: block;
+            overflow: hidden;
+            color: #f4f7fb;
+            font-size: clamp(0.98rem, 4.6vw, 1.18rem);
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            line-height: 1.15;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chart-shell {
+            position: relative;
+            height: 154px;
+            margin-top: 20px;
+            padding: 10px 4px 0;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        .text-success {
+            color: #55d5a8 !important;
+        }
+
+        .text-danger {
+            color: #ff7085 !important;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .habit-row:hover {
+                transform: translateY(-2px);
+                border-color: var(--border-medium);
+                box-shadow: 0 13px 29px rgba(0, 0, 0, 0.18);
+            }
+
+            .habit-toggle:hover,
+            .tap-button:hover,
+            .routine-button:hover {
+                filter: brightness(1.06);
+            }
+        }
+
+        @media (min-width: 576px) {
+            .min-w-0 {
+            min-width: 0;
+        }
+
+        .app-shell {
+                padding-inline: 20px;
+            }
+
+            .app-topbar {
+                padding-inline: 18px;
+            }
+
+            .hero-card {
+                padding: 26px 24px;
+            }
+
+            .premium-card {
+                padding: 20px;
+            }
+
+            .meal-badge-scroll {
+                margin-inline: -20px;
+                padding-inline: 20px;
+                scroll-padding-inline: 20px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .min-w-0 {
+            min-width: 0;
+        }
+
+        .app-shell {
+                padding-top: 22px;
+            }
+
+            .app-topbar {
+                top: 16px;
+                margin-bottom: 24px;
+            }
+
+            .hero-card {
+                min-height: 216px;
+            }
+
+            .score-ring-wrap,
+            .score-ring-wrap svg {
+                width: 148px;
+                height: 148px;
+            }
+
+            .habit-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 374.98px) {
+            .min-w-0 {
+            min-width: 0;
+        }
+
+        .app-shell {
+                padding-inline: 10px;
+            }
+
+            .app-topbar {
+                padding-left: 13px;
+            }
+
+            .level-panel {
+                width: 101px;
+            }
+
+            .hero-card {
+                padding-inline: 12px;
+            }
+
+            .score-ring-wrap,
+            .score-ring-wrap svg {
+                width: 116px;
+                height: 116px;
+            }
+
+            .habit-note {
+                max-width: 202px;
+            }
+
+            .smoke-control {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .smoke-control form,
+            .smoke-control .tap-button {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        @keyframes xpReveal {
+            from { transform: scaleX(0); transform-origin: left; }
+            to { transform: scaleX(1); transform-origin: left; }
+        }
+
+        @keyframes ringReveal {
+            from { opacity: 0.35; }
+            to { opacity: 1; }
+        }
+
+        @keyframes shimmer {
+            0%, 38% { transform: translateX(-100%); }
+            72%, 100% { transform: translateX(120%); }
+        }
+
+        @keyframes alertPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 93, 115, 0.15); }
+            50% { box-shadow: 0 0 0 5px rgba(255, 93, 115, 0); }
+        }
+    </style>
+</head>
+<body>
+
+<main class="app-shell">
+
+    <!-- Top Bar: Profil & Gamification cu Progress Bar -->
+    <header class="app-topbar">
+        <div class="min-w-0">
+            <span class="eyebrow">Sistemul tău de operare</span>
+            <h1 class="welcome-title">Salut, {{ profile.name }}</h1>
+        </div>
+
+        <div class="level-panel">
+            <div class="level-badge">
+                <span class="level-badge__icon">⚡</span>
+                <span>Lvl {{ profile.level }}</span>
+            </div>
+            <!-- BARA DE PROGRES PENTRU XP -->
+            <div class="xp-track">
+                <div class="xp-fill" style="width: {{ xp_progress_pct }}%;"></div>
+            </div>
+            <small class="xp-label">{{ profile.xp_current }} / {{ next_level_xp }} XP</small>
+        </div>
+    </header>
+
+    <!-- Card Principal: Statusul Zilei Dinamic -->
+    <section class="premium-card hero-card">
+        <div class="row align-items-center g-2 g-sm-4 h-100">
+            <div class="col-5 col-sm-4">
+                <div class="score-ring-wrap">
+                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#54e7b7"/>
+                                <stop offset="55%" stop-color="#22c993"/>
+                                <stop offset="100%" stop-color="#5b7cfa"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="score-ring-track" cx="50" cy="50" r="42" stroke-width="6" fill="transparent"/>
+                        <!-- Offset-ul este calculat matematic în funcție de procent -->
+                        <circle cx="50" cy="50" r="42" stroke-width="6" fill="transparent"
+                                class="progress-ring-circle" stroke-dasharray="263" stroke-dashoffset="{{ 263 - (263 * daily_score_pct / 100) }}"/>
+                    </svg>
+                    <div class="score-value">
+                        <strong>{{ daily_score_pct }}%</strong>
+                        <span>astăzi</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-7 col-sm-8 hero-copy">
+                <span class="hero-kicker">Execuție zilnică</span>
+                <h2 class="hero-title">Scorul Zilei</h2>
+                <p class="hero-description">Fără negocieri. Menține progresul stabil, execută minimul și revino imediat când o zi nu iese perfect.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Secțiunea: Core Habits -->
+    <section class="section-block">
+        <div class="section-heading">
+            <h2 class="section-heading__main">
+                <span class="section-heading__dot"></span>
+                Obiective obligatorii
+            </h2>
+            <span class="section-heading__caption">Nucleul zilei</span>
+        </div>
+
+        <div class="habit-list">
+            {% for field, label, note in [
+                ('prog_completed', '💻 Programare', 'Minimum 30 de minute active'),
+                ('plc_completed', '🔌 PLC / Automatizări', 'Minimum 30 de minute studiu manual'),
+                ('elec_completed', '⚡ Electrică', 'Minimum 30 de minute fixate'),
+                ('project_completed', '🛠️ Proiect Personal', 'Dezvoltare funcționalități noi'),
+                ('gym_completed', '🏋️ Sală sau Mișcare', 'Antrenament intens finalizat'),
+                ('review_completed', '📅 Planificare & Review', 'Organizare zi următoare')
+            ] %}
+            <article class="habit-row {% if getattr(log, field) %}completed{% endif %}">
+                <div class="habit-copy">
+                    <span class="habit-title {% if getattr(log, field) %}text-decoration-line-through{% endif %}">
+                        {{ label }}
+                    </span>
+                    <small class="habit-note">{{ note }}</small>
+                </div>
+
+                <form action="/toggle-habit/{{ field }}" method="POST" class="habit-form">
+                    <button type="submit" class="habit-toggle {% if getattr(log, field) %}is-complete{% else %}is-pending{% endif %}">
+                        {% if getattr(log, field) %}✔{% else %}☐{% endif %}
+                    </button>
+                </form>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="row g-3 g-lg-4">
+        <!-- Modul Alimentație Bulk cu Progress Bar -->
+        <div class="col-12 col-lg-7">
+            <article class="premium-card module-card">
+                <div class="module-header">
+                    <div class="module-title-wrap">
+                        <span class="module-kicker">Nutriție zilnică</span>
+                        <h2 class="module-title module-title--warning">🥩 Alimentație & Plan Bulk</h2>
+                    </div>
+
+                    {% if total_calories >= 3000 %}
+                    <span class="status-chip status-chip--success">🟢 +50 XP · Target atins</span>
+                    {% else %}
+                    <span class="status-chip">Țintă: 3000 kcal</span>
+                    {% endif %}
+                </div>
+
+                <div class="nutrition-progress" role="progressbar" aria-label="Progres calorii">
+                    <div class="nutrition-progress__bar" style="width: {{ [ (total_calories / 3000 * 100)|int, 100 ]|min }}%"></div>
+                </div>
+
+                <div class="progress-meta">
+                    <span>Total acumulat</span>
+                    <span><strong>{{ total_calories }}</strong> / 3000 kcal</span>
+                </div>
+
+                <form action="/add-meal" method="POST" class="row g-2 compact-form">
+                    <div class="col-7">
+                        <input type="text" name="meal_name" class="form-control form-control-premium" placeholder="Masă" required>
+                    </div>
+                    <div class="col-3">
+                        <input type="number" name="calories" class="form-control form-control-premium" placeholder="Kcal" required>
+                    </div>
+                    <div class="col-2">
+                        <button type="submit" class="btn tap-button button-warning w-100" aria-label="Adaugă masa">+</button>
+                    </div>
+                </form>
+
+                <div class="meal-badge-scroll">
+                    {% for meal in today_meals %}
+                    <span class="meal-chip">
+                        <span class="meal-chip__time">[{{ meal.meal_time }}]</span>
+                        <span>{{ meal.meal_name }} · {{ meal.calories }} kcal</span>
+                    </span>
+                    {% else %}
+                    <span class="empty-state">Nicio masă adăugată astăzi.</span>
+                    {% endfor %}
+                </div>
+            </article>
+        </div>
+
+        <!-- Modul Control Fumat -->
+        <div class="col-12 col-lg-5">
+            <article class="premium-card module-card">
+                <div class="module-header">
+                    <div class="module-title-wrap">
+                        <span class="module-kicker">Control gradual</span>
+                        <h2 class="module-title module-title--danger">🚭 Plan Reducere Fumat</h2>
+                    </div>
+                    <span class="status-chip status-chip--danger">Max {{ smoke_target }} azi</span>
+                </div>
+
+                {% if log.cigarettes_count > smoke_target %}
+                <div class="smoke-alert">
+                    ⚠️ LIMITĂ DEPĂȘITĂ: Disciplina a eșuat.
+                </div>
+                {% endif %}
+
+                <div class="smoke-control">
+                    <div>
+                        <span class="metric-label">Fumate în prezent</span>
+                        <h3 class="metric-value">
+                            {{ log.cigarettes_count }}
+                            <span class="metric-value__unit">țigări</span>
+                        </h3>
+                    </div>
+
+                    <form action="/update-cigarettes" method="POST" style="margin: 0;">
+                        <input type="hidden" name="count" value="{{ log.cigarettes_count + 1 }}">
+                        <button type="submit" class="btn tap-button button-danger px-4">+ Log 1</button>
+                    </form>
+                </div>
+            </article>
+        </div>
+
+        <!-- Modul Rutină Îngrijire -->
+        <div class="col-12 col-lg-5">
+            <article class="premium-card module-card">
+                <div class="module-header">
+                    <div class="module-title-wrap">
+                        <span class="module-kicker">Rutină zilnică</span>
+                        <h2 class="module-title module-title--info">🩺 Îngrijire · Ten & Păr</h2>
+                    </div>
+                </div>
+
+                <div class="routine-grid">
+                    <form action="/toggle-habit/routine_morning" method="POST">
+                        <button type="submit" class="btn routine-button w-100 {% if log.routine_morning %}is-complete{% else %}is-pending{% endif %}">
+                            🌅 Dimineață {% if log.routine_morning %}✔{% endif %}
+                        </button>
+                    </form>
+
+                    <form action="/toggle-habit/routine_evening" method="POST">
+                        <button type="submit" class="btn routine-button w-100 {% if log.routine_evening %}is-complete{% else %}is-pending{% endif %}">
+                            🌌 Seară {% if log.routine_evening %}✔{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </article>
+        </div>
+
+        <!-- Modul Finanțe -->
+        <div class="col-12 col-lg-7">
+            <article class="premium-card module-card">
+                <div class="module-header">
+                    <div class="module-title-wrap">
+                        <span class="module-kicker">Control buget</span>
+                        <h2 class="module-title module-title--success">💰 Finanțe</h2>
+                    </div>
+                </div>
+
+                <div class="finance-stats">
+                    <div class="finance-stat">
+                        <span class="finance-stat__label">Limita optimă / zi</span>
+                        <strong class="finance-stat__value">{{ "%.2f"|format(budget_zilnic) }} RON</strong>
+                    </div>
+
+                    <div class="finance-stat">
+                        <span class="finance-stat__label">Cheltuit azi</span>
+                        <strong class="finance-stat__value {% if log.expenses_total > budget_zilnic %}text-danger{% else %}text-success{% endif %}">
+                            {{ "%.2f"|format(log.expenses_total) }} RON
+                        </strong>
+                    </div>
+                </div>
+
+                <form action="/add-expense" method="POST" class="d-flex gap-2">
+                    <input type="number" step="0.01" name="amount" class="form-control form-control-premium text-start" placeholder="Sumă (RON)" required>
+                    <button type="submit" class="btn tap-button button-success px-4" aria-label="Adaugă cheltuiala">+</button>
+                </form>
+
+                <div class="chart-shell">
+                    <canvas id="budgetChartMobile"></canvas>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<script>
+    /* 1. SCRIPT PENTRU MENȚINEREA POZIȚIEI DE SCROLL */
+    document.addEventListener("DOMContentLoaded", function() {
+        if (sessionStorage.getItem("scrollPosition")) {
+            window.scrollTo(0, sessionStorage.getItem("scrollPosition"));
+            sessionStorage.removeItem("scrollPosition"); // Resetăm după ce am făcut scroll
+        }
+    });
+
+    document.querySelectorAll("form").forEach(form => {
+        form.addEventListener("submit", function() {
+            sessionStorage.setItem("scrollPosition", window.scrollY);
+        });
+    });
+
+    /* 2. SCRIPT GRAFIC FINANȚE */
+    const ctx = document.getElementById('budgetChartMobile').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|tojson }},
+            datasets: [{
+                label: 'RON',
+                data: {{ chart_data|tojson }},
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+                y: { grid: { color: '#1f293d' }, ticks: { color: '#64748b', font: { size: 10 } } }
+            }
+        }
+    });
+</script>
+</body>
+</html>
